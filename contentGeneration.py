@@ -154,19 +154,17 @@ def _create_article(keyword, new_outline, selected_funnel, other_keywords):
     <sample markdown>
 
     This is some basic, sample markdown.
-    # H1 for article
-    ## H2. Second Heading
+        # H1 for title
+        ## H2. for main section
+        ### H3 for subsection within main section. The smallest level of heading
+        
+        * Unordered lists or Ordered list within the main sections or subsection:
+        1. One
+        2. Two
+        3. Three
+        * More
 
-
-    * Unordered lists, and:
-    1. One
-    2. Two
-    3. Three
-    * More
-
-    > Blockquote
-
-    And **bold**, *italics*, and even *italics and later **bold***. Even ~~strikethrough~~. [A link](https://markdowntohtml.com) to somewhere.
+        And **bold**, *italics*, and even *italics and later **bold***. [A link](https://markdowntohtml.com) to somewhere.
 
     </sample markdown>
 
@@ -247,7 +245,7 @@ def _create_article(keyword, new_outline, selected_funnel, other_keywords):
     """
 
     prompt = f"""
-    create the whole article follow by instructions. 
+    create the whole article followed by instructions in the markdown format.
     ```{instructions}```
     """
     article = get_completion(prompt)
