@@ -46,10 +46,6 @@ image_link = None
 today_date = None
 metadata = None
 
-# Set a timeout in seconds (adjust as needed) as Time limit for checking each rule.
-timeout_seconds = 60  # 1 minutes
-
-#get today's date for record
 
 # %%
 #create avatar list in funnels
