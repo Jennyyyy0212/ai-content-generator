@@ -117,14 +117,14 @@ class BlogDataToCSV:
         table_prefix = os.path.splitext(database_filename)[0]
         self.data_table = f"{table_prefix}_data_table"
         self.meta_table = f"{table_prefix}_meta_table"
-        self.csv_data_filename = f"{self.data_table}_data.csv"
-        self.csv_meta_filename = f"{self.meta_table}_data.csv"
+        self.csv_data_filename = f"{self.data_table}.csv"
+        self.csv_meta_filename = f"{self.meta_table}.csv"
 
     
     def export_to_csv(self):
         # Retrieve data from table1 and export it to CSV1
         conn = sqlite3.connect(self.database_filename)
-        query1 = "SELECT * FROM {self.date_table}"
+        query1 = f"SELECT * FROM {self.data_table}"
         df1 = pd.read_sql_query(query1, conn)
         df1.to_csv(self.csv_data_filename, index=False)
 
