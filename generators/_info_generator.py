@@ -1,4 +1,4 @@
-from . import ArticleGenerator  # Import all from the 'content' module
+from ._content import ArticleGenerator  # Import all from the 'content' module
 import openai                   # Import the 'openai' package for using the OpenAI API
 import markdown                 # Import the 'markdown' package for working with Markdown text
 import re                       # Import the 're' module for regular expressions
