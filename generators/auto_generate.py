@@ -1,6 +1,6 @@
 
 from data_to_csv import *                   # Import all modules from data_to_csv
-from info_generator import ContentCreator   # Import the ContentCreator class from info_generator
+from . import ContentCreator                # Import the ContentCreator class from info_generator
 import logging                              # Import the logging module
 
 class AutoGenerator:

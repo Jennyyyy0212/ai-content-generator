@@ -1,8 +1,8 @@
-from content import *         # Import all from the 'content' module
-import openai                 # Import the 'openai' package for using the OpenAI API
-import markdown               # Import the 'markdown' package for working with Markdown text
-import re                     # Import the 're' module for regular expressions
-import os                     # Import the 'os' module for interacting with the operating system
+from . import ArticleGenerator  # Import all from the 'content' module
+import openai                   # Import the 'openai' package for using the OpenAI API
+import markdown                 # Import the 'markdown' package for working with Markdown text
+import re                       # Import the 're' module for regular expressions
+import os                       # Import the 'os' module for interacting with the operating system
 from dotenv import load_dotenv, find_dotenv 
 # Import the 'load_dotenv' and 'find_dotenv' functions from the 'dotenv' package
 
