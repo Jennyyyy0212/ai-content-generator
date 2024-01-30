@@ -1,12 +1,28 @@
-# %%
-import pandas as pd
-import sqlite3
-import json
-import os
+import pandas as pd  # Pandas library for data manipulation and analysis (aliased as 'pd')
+import sqlite3       # SQLite database library for working with databases
+import json          # JSON library for handling JSON data
+import os            # OS library for interacting with the operating system
 
-# %%
 class BlogDataToDatabase:
+    """
+    A class for managing data in an SQLite database for a blog.
+
+    Args:
+        database_filename (str): The filename of the SQLite database.
+
+    Attributes:
+        conn (sqlite3.Connection): The SQLite database connection.
+        data_table (str): The name of the data table in the database.
+        meta_table (str): The name of the meta table in the database.
+    """
+
     def __init__(self, database_filename):
+        """
+        Initialize a new instance of BlogDataToDatabase.
+
+        Args:
+            database_filename (str): The filename of the SQLite database.
+        """
         self.conn = sqlite3.connect(database_filename)  # SQLite database
         table_prefix = os.path.splitext(database_filename)[0]
         self.data_table = f"{table_prefix}_data_table"
@@ -54,7 +70,21 @@ class BlogDataToDatabase:
         self.conn.execute(create_meta_table_query)
 
     def add_blog_entry(self, name, post_body, post_summary, main_image, thumbnail_image, meta_title, meta_description, image_alt_text, tag, reading_time):
-        # Insert data into the database
+        """
+        Add a new blog entry to the database.
+
+        Args:
+            name (str): The name of the blog entry.
+            post_body (str): The body of the blog post.
+            post_summary (str): The summary of the blog post.
+            main_image (str): The URL of the main image.
+            thumbnail_image (str): The URL of the thumbnail image.
+            meta_title (str): The meta title of the blog post.
+            meta_description (str): The meta description of the blog post.
+            image_alt_text (str): The alt text for images.
+            tag (str): The tag associated with the blog post.
+            reading_time (str): The estimated reading time for the blog post.
+        """
         insert_sql = '''
             INSERT INTO {} (Name, Slug, Collection_ID, Item_ID, Created_On, Updated_On, Published_On, Post_Body, Post_Summary, Main_Image, Thumbnail_Image, Featured, Color, Meta_Title, Meta_Description, Image_Alt_Text, Tag, Reading_Time)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -68,6 +98,12 @@ class BlogDataToDatabase:
         self.conn.commit()
 
     def insert_json_data_to_db(self, json_data_str):
+        """
+        Insert JSON data into the meta table of the database.
+
+        Args:
+            json_data_str (str): A JSON string containing data to insert into the database.
+        """
         try:
             # # Parse the JSON data
             # data = json.loads(json_data)
@@ -107,12 +143,33 @@ class BlogDataToDatabase:
 
 
     def close_database(self):
-        # Close the database connection
+        """
+        Close the database connection.
+        """
         self.conn.close()
 
 # %%
 class BlogDataToCSV:
+    """
+    A class for exporting data from an SQLite database to CSV files.
+
+    Args:
+        database_filename (str): The filename of the SQLite database.
+
+    Attributes:
+        database_filename (str): The filename of the SQLite database.
+        data_table (str): The name of the data table in the database.
+        meta_table (str): The name of the meta table in the database.
+        csv_data_filename (str): The filename for the CSV file containing data.
+        csv_meta_filename (str): The filename for the CSV file containing meta data.
+    """
     def __init__(self, database_filename):
+        """
+        Initialize a new instance of BlogDataToCSV.
+
+        Args:
+            database_filename (str): The filename of the SQLite database.
+        """
         self.database_filename = database_filename
         table_prefix = os.path.splitext(database_filename)[0]
         self.data_table = f"{table_prefix}_data_table"
@@ -122,6 +179,9 @@ class BlogDataToCSV:
 
     
     def export_to_csv(self):
+        """
+        Export data from the database to CSV files.
+        """
         # Retrieve data from table1 and export it to CSV1
         conn = sqlite3.connect(self.database_filename)
         query1 = f"SELECT * FROM {self.data_table}"

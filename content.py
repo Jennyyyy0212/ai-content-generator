@@ -1,14 +1,9 @@
-# %%
-# !pip  install openai
-
-# %%
-# import packages and openai_key
-import openai
-import os
-import time
-import datetime
-import random
-from openai import OpenAI
+import openai               # Import the OpenAI Python library
+import os                   # Import the os module for operating system-related functions
+import time                 # Import the time module for handling timestamps
+import datetime             # Import the datetime module for date-related operations
+import random               # Import the random module for generating random values
+from openai import OpenAI   # Import the OpenAI class from the OpenAI library
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -18,6 +13,25 @@ os.environ['OPENAI_API_KEY'] = 'sk-3oK5M8hCodk0Z9x4QKfdT3BlbkFJm7sO6hRqtFL8Pf8Ie
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 class ArticleGenerator:
+    """
+        ArticleGenerator class generates articles, abstracts, and images for blog content.
+        It utilizes the OpenAI API for content generation and image creation.
+
+        Attributes:
+            client (OpenAI): An instance of the OpenAI client.
+            total_start_time (float): The timestamp when the generation process starts.
+            today_date (datetime.date): The current date.
+            outline (str): The article outline obtained from a given link.
+            new_outline (str): A revised article outline with a clickable title.
+            other_keywords (str): Related keywords for the article content.
+            level (str): The funnel level for targeting the audience.
+            selected_funnel (str): The selected funnel description.
+            full_article (str): The generated full article content.
+            image_link (str): The link to the blog picture.
+            abstract (str): A short abstract of the article.
+            metadata (str): JSON data structure containing metadata about the generated content.
+    """
+
     top_funnel = f""" 
     Prospective Shopify owners and e-commerce enthusiasts who are relatively new to the online selling landscape. 
     They may be exploring entrepreneurship opportunities, seeking to set up their first online store, or looking for ways to enhance their existing store. 
@@ -39,10 +53,28 @@ class ArticleGenerator:
     This group may also have a keen interest in ethical considerations and privacy aspects related to A/B testing.
     """
 
-
     funnel_list = {'top':top_funnel, 'middle': middle_funnel, 'bottom': bottom_funnel}
 
     def __init__(self):
+        """
+        Initializes an instance of the ArticleGenerator class, which generates articles, abstracts, and images for blog content using the OpenAI API.
+
+        Attributes:
+            client (OpenAI): An instance of the OpenAI client.
+            total_start_time (float): The timestamp when the generation process starts.
+            today_date (datetime.date): The current date.
+            outline (str): The article outline obtained from a given link.
+            new_outline (str): A revised article outline with a clickable title.
+            other_keywords (str): Related keywords for the article content.
+            level (str): The funnel level for targeting the audience.
+            selected_funnel (str): The selected funnel description.
+            full_article (str): The generated full article content.
+            image_link (str): The link to the blog picture.
+            abstract (str): A short abstract of the article.
+            metadata (str): JSON data structure containing metadata about the generated content.
+
+        Initializes the ArticleGenerator with necessary attributes, including an instance of the OpenAI client, timestamps, and placeholders for various content components.
+        """
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"),)
         self.total_start_time = None
         self.today_date = None
@@ -57,6 +89,15 @@ class ArticleGenerator:
         self.metadata = None
 
     def _get_completion(self, prompt):
+        """
+        Get a completion response from the OpenAI API based on the provided prompt.
+
+        Args:
+            prompt (str): The input prompt for content generation.
+
+        Returns:
+            str: The generated content as a response to the prompt.
+        """
         messages = [{"role": "user", "content": prompt}]
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -66,6 +107,9 @@ class ArticleGenerator:
         return response.choices[0].message.content
 
     def _reset(self):
+        """
+        Reset the instance attributes to their default values.
+        """
         self.total_start_time = None
         self.outline = None
         self.new_outline = None
@@ -80,9 +124,15 @@ class ArticleGenerator:
     
 
     def _get_outline(self, website_link):
-        # read the outline from the website link
-        # need to change website link
+        """
+        Obtain an article outline based on a provided website link.
 
+        Args:
+            website_link (str): The link to the source article.
+
+        Returns:
+            str: The generated article outline.
+        """
         prompt = f"""
         create an outline based on the article link
         ```{website_link}```
@@ -92,7 +142,16 @@ class ArticleGenerator:
     
 
     def _generate_new_outline(self, keyword, outline):
-        # generate a clickable article title based on the provided outline and keyword.
+        """
+        Generate a new article outline with a clickable title based on the provided outline and keyword.
+
+        Args:
+            keyword (str): The primary keyword for the article.
+            outline (str): The original article outline.
+
+        Returns:
+            str: The revised article outline with a clickable title.
+        """
 
         prompt = f"""
         Based on the outline, create a clickable article title that included the keyword and revise the outline to be used in my owm article based on revised title \
@@ -104,7 +163,16 @@ class ArticleGenerator:
         return self.new_outline
 
     def _generate_keyword(self, keyword, new_outline):
-        # list the 10 related keywords
+        """
+        Generate 10 related keywords for the article content based on the new outline.
+
+        Args:
+            keyword (str): The primary keyword for the article.
+            new_outline (str): The revised article outline with a clickable title.
+
+        Returns:
+            str: Related keywords for the article content.
+        """
 
         prompt = f"""
         Based on the new outline, list some keywords that related the content and title in total of 10. Do not include the primpary keyword.
@@ -115,15 +183,41 @@ class ArticleGenerator:
         return self.other_keywords
     
     def _get_funel(self, level):
+        """
+        Get a funnel description based on the provided level.
+
+        Args:
+            level (str): The funnel level (top, middle, or bottom).
+
+        Returns:
+            str: The funnel description.
+        """
         self.selected_funnel = self.funnel_list.get(level)
         return self.selected_funnel
 
     def _get_funel_level(self):
+        """
+        Get a random funnel level (top, middle, or bottom).
+
+        Returns:
+            str: A randomly selected funnel level.
+        """
         level = random.choice(["top", "middle", "bottom"])
         return level
 
     def _create_article(self, keyword, new_outline, selected_funnel, other_keywords):
-        # creating the article with instructions
+        """
+        Generate the full article content with specific instructions.
+
+        Args:
+            keyword (str): The primary keyword for the article.
+            new_outline (str): The revised article outline with a clickable title.
+            selected_funnel (str): The selected funnel description.
+            other_keywords (str): Related keywords for the article content.
+
+        Returns:
+            str: The generated full article content.
+        """
 
         instructions = f"""
         Rewrite this title. Write the article readable for people in 6th grade. Use the headings and subheadings but use different words. \
@@ -236,7 +330,20 @@ class ArticleGenerator:
         return self.full_article
 
     def _get_abstract(self, final_article):
-        # create a short abstract of article within 500 words due to the prompt limit in image generation
+        """
+        Generate a short abstract of the article within 500 characters.
+
+        Args:
+            final_article (str): The generated full article content.
+
+        Returns:
+            str: A short abstract of the article.
+        """
+        prompt = f"""
+        do the overview of the article within 500 characters.
+
+        article: ```{final_article}```
+        """
 
         prompt = f"""
         do the overview of the artciel within 500 characters.
@@ -248,9 +355,15 @@ class ArticleGenerator:
         return self.abstract
     
     def _create_blog_picture(self, abstract):
-        # function to create a blog picture
-        # change testing_text to article
-        # Define the prompt
+        """
+        Generate a blog picture based on the provided abstract.
+
+        Args:
+            abstract (str): A short abstract of the article.
+
+        Returns:
+            str: The link to the generated blog picture.
+        """
         prompt = f"Create a blog picture in English based on the following blog content: '{abstract}'."
 
         # Specify other parameters
@@ -272,12 +385,27 @@ class ArticleGenerator:
         return self.image_link
     
     def _get_duration(self):
+        """
+        Calculate the duration of the content generation process.
+
+        Returns:
+            float: The duration in minutes.
+        """
         total_finish_time = time.time()
         duration = round((total_finish_time - self.total_start_time) / 60, 2)
         return duration
 
     def _create_metadata(self, keyword, input_link):
-        # create meta data in JSON
+        """
+        Create metadata in JSON format containing information about the generated content.
+
+        Args:
+            keyword (str): The primary keyword for the article.
+            input_link (str): The link to the source content.
+
+        Returns:
+            str: JSON data structure containing metadata.
+        """
         prompt = f"""
         Create a JSON data structure designed to collect information on titles, keywords, and funnels. \
         The structure should include keys named 'title', 'blog picture link', 'primary keyword', 'other_keywords', 'funnel', 'minutes' ,'date',and 'reference'. \
@@ -304,6 +432,13 @@ class ArticleGenerator:
         return self.metadata
 
     def _generate_article(self, input_link, keyword):
+        """
+        Generate an article, abstract, and image based on the provided input link and keyword.
+
+        Args:
+            input_link (str): The link to the source content.
+            keyword (str): The primary keyword for the article.
+        """
         self._reset()
         self.total_start_time = time.time()
         self.today_date = datetime.date.today()
@@ -315,16 +450,29 @@ class ArticleGenerator:
         self.full_article = self._create_article(keyword, self.new_outline, self.selected_funnel, self.other_keywords)
 
     def _generate_picture(self):
+        """
+        Generate a blog picture based on the article's abstract.
+        """
         self.abstract = self._get_abstract(self.full_article)
         self.image_link = self._create_blog_picture(self.abstract)
 
     def run(self, input_link, keyword):
+        """
+        Run the entire content generation process including article, abstract, and image generation.
+
+        Args:
+            input_link (str): The link to the source content.
+            keyword (str): The primary keyword for the article.
+        """
         self._generate_article(input_link, keyword)
         self._generate_picture()
         self.duration = self._get_duration()
         self.metadata = self._create_metadata(keyword, input_link)
 
     def get_all_results(self):
+        """
+        Print the generated article, image link, and metadata.
+        """
         print("Article: ")
         print(self.full_article)
         print()
@@ -334,33 +482,6 @@ class ArticleGenerator:
         print("Meta data: ")
         print(self.metadata)
 
-    def get_article(self):
-        return self.full_article
-
-    def get_metadata(self):
-        return self.metadata
-
-    def get_picture_link(self):
-        return self.image_link
-
-    # get to know each variable now
-    def get_outline(self):
-        return self.outline
-
-    def get_new_outline(self):
-        return self.new_outline
-
-    def get_other_keywords(self):
-        return self.other_keywords
-
-    def get_level(self):
-        return self.level
-
-    def get_selected_funnel(self):
-        return self.selected_funnel
-
-    def get_abstract(self):
-        return self.abstract
 
 
 
