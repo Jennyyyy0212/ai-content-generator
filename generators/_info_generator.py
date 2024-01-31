@@ -1,5 +1,6 @@
 from ._content import ArticleGenerator  # Import all from the 'content' module
 import openai                   # Import the 'openai' package for using the OpenAI API
+from openai import OpenAI       # Import the 'openai' package for using the OpenAI API
 import markdown                 # Import the 'markdown' package for working with Markdown text
 import re                       # Import the 're' module for regular expressions
 import os                       # Import the 'os' module for interacting with the operating system
@@ -261,12 +262,12 @@ class ContentCreator:
         self.content_generator = ArticleGenerator()
         self.content_generator.run(input_link,keyword)
         self.keyword = keyword
-        article = self.content_generator.get_article()
-        abstract = self.content_generator.get_abstract()
+        article = self.content_generator.full_article
+        abstract = self.content_generator.abstract
 
         self.split_markdown_title_content(article)
         self.convert_markdown_to_html(self.content)
-        self.main_t_image = self.content_generator.get_picture_link()
+        self.main_t_image = self.content_generator.image_link
         self.generate_post_summary(abstract)
         self.generate_meta_title()
         self.generate_meta_description()
