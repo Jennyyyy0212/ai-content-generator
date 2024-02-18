@@ -93,7 +93,7 @@ class ContentCreator:
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
-            temperature=1 #update the temperature from 0 to 1 to make randomness
+            temperature=0 #update the temperature from 0 to 1 to make randomness
         )
         return response.choices[0].message.content
     
