@@ -87,6 +87,7 @@ class ArticleGenerator:
         self.image_link = None
         self.abstract = None
         self.metadata = None
+        self.duration = None
 
     def _get_completion(self, prompt):
         """
@@ -100,7 +101,7 @@ class ArticleGenerator:
         """
         messages = [{"role": "user", "content": prompt}]
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo-1106",
             messages=messages,
             temperature=0 #update the temperature from 0 to 1 to make randomness
         )
@@ -111,16 +112,17 @@ class ArticleGenerator:
         Reset the instance attributes to their default values.
         """
         self.total_start_time = None
+        self.today_date = None
         self.outline = None
         self.new_outline = None
         self.other_keywords = None
         self.level = None
         self.selected_funnel = None
-        self.abstract = None
         self.full_article = None
         self.image_link = None
-        self.today_date = None
+        self.abstract = None
         self.metadata = None
+        self.duration = None
     
 
     def _get_outline(self, website_link):
@@ -141,13 +143,12 @@ class ArticleGenerator:
         return self.outline
     
 
-    def _generate_new_outline(self, keyword, outline):
+    def _generate_new_outline(self, keyword):
         """
         Generate a new article outline with a clickable title based on the provided outline and keyword.
 
         Args:
             keyword (str): The primary keyword for the article.
-            outline (str): The original article outline.
 
         Returns:
             str: The revised article outline with a clickable title.
@@ -157,12 +158,12 @@ class ArticleGenerator:
         Based on the outline, create a clickable article title that included the keyword and revise the outline to be used in my owm article based on revised title \
         It shouldn't include any other brand service or product. 
         keyword: ```{keyword}```
-        outline: ```{outline}```
+        outline: ```{self.outline}```
         """
         self.new_outline = self._get_completion(prompt)
         return self.new_outline
 
-    def _generate_keyword(self, keyword, new_outline):
+    def _generate_keyword(self, keyword):
         """
         Generate 10 related keywords for the article content based on the new outline.
 
@@ -177,12 +178,12 @@ class ArticleGenerator:
         prompt = f"""
         Based on the new outline, list some keywords that related the content and title in total of 10. Do not include the primpary keyword.
         primary keyword: ```{keyword}```
-        outline: ```{new_outline}```
+        outline: ```{self.new_outline}```
         """
         self.other_keywords = self._get_completion(prompt)
         return self.other_keywords
     
-    def _get_funel(self, level):
+    def _get_funel(self):
         """
         Get a funnel description based on the provided level.
 
@@ -192,7 +193,7 @@ class ArticleGenerator:
         Returns:
             str: The funnel description.
         """
-        self.selected_funnel = self.funnel_list.get(level)
+        self.selected_funnel = self.funnel_list.get(self.level)
         return self.selected_funnel
 
     def _get_funel_level(self):
@@ -202,33 +203,35 @@ class ArticleGenerator:
         Returns:
             str: A randomly selected funnel level.
         """
-        level = random.choice(["top", "middle", "bottom"])
-        return level
+        self.level = random.choice(["top", "middle", "bottom"])
+        return self.level
 
-    def _create_article(self, keyword, new_outline, selected_funnel, other_keywords):
+    def _create_article(self, keyword):
         """
         Generate the full article content with specific instructions.
 
         Args:
             keyword (str): The primary keyword for the article.
-            new_outline (str): The revised article outline with a clickable title.
-            selected_funnel (str): The selected funnel description.
-            other_keywords (str): Related keywords for the article content.
 
         Returns:
             str: The generated full article content.
         """
 
         instructions = f"""
-        Rewrite this title. Write the article readable for people in 6th grade. Use the headings and subheadings but use different words. \
-        Do not use the brands from the outline, use my brands from the XML <internal links>. \
-        Once you've used an internal link, do not use that internal link again. \
+        Rewrite this title. Write at least 1000 words article readable for people in 6th grade. Use the headings and subheadings but use different words. \
+        Do not use the brands from the outline, use my brands from the XML <internal links> only. \
+        Once you've used an internal link, do not use that internal link again.\
         Take the <avatar> and write an article specifically for that person. Your tone should match the needs of the <avatar>. Do not mention the <avatar>. \
         Do not mention other companies or brands, but focus more on educational or informative content. \
         Write with a huge degree of creativity and informative burstiness. Try to include <keywords> as much as possible. \
         Naturally add the primary keywords and other keywords into articles.  Explain nouns or ideas with examples and detailed explanations. \
+        
+        The article should be written in a manner that is easily understandable by individuals at a 6th-grade reading level. This involves using simple language, short sentences, and clear explanations of any complex terms or concepts.\
+            
+        Each heading (formatted as '##' for H2 and '###' for H3) must be followed by at least eight sentences of relevant content. Additionally, for every ordered or unordered list in the article, there must be accompanying explanations and examples followed by at least five sentences for each list item, formatted in Markdown. The article must include at least one ordered (numbered) or unordered (bulleted) list. These lists should be formatted in Markdown (e.g., '* Item' for unordered lists, '1. Item' for ordered lists) and must appear under a heading formatted as either '##' (H2) or '###' (H3). \
+             
         Do not  mention any brand, services, or products. It is informative content. Create pictures to explain the ideas. \
-        Include all of the following HTML formatting at least once:
+        Include all of the following markdown formatting at least once:
 
         <sample markdown>
 
@@ -247,7 +250,7 @@ class ArticleGenerator:
 
         </sample markdown>
 
-        Use all parts of <sample markdown>. Use the <outline> with the Focus keyword . Articles should include the h1, h2, h3 font size. where H1 is used for main title of the article and include the Focus keyword in <outline>. H2 are headings that break up the main sections of your content, add most keywords here, plan on around 3-5 of these H2s in 1000 words article. H3 are break up and list individual points in the main sections, in the form of numbered lists or clarifying sections to an H2 heading, for <keywords>
+        Use all parts of <sample markdown>. Use the <outline> with the Focus keyword . Articles should include the h1, h2, h3 font size. where H1 is used for main title of the article and include the Focus keyword in <outline>. H2 are headings that break up the main sections of your content, add most keywords here, plan on around 3-5 of these H2s. H3 are break up and list individual points in the main sections, in the form of numbered lists or clarifying sections to an H2 heading, for <keywords>
 
         Firstly, write an introduction, with one paragraph, and an unordered list summarizing the entire article
 
@@ -262,19 +265,19 @@ class ArticleGenerator:
 
         Focus keyword: ```{keyword}```
 
-        title and outline: ```{new_outline}```
+        title and outline: ```{self.new_outline}```
 
         </outline>
 
         <avatar>
 
-        funnel: ```{selected_funnel}```
+        funnel: ```{self.selected_funnel}```
 
         </avatar>
 
         <keywords>
 
-        ```{other_keywords}```
+        ```{self.other_keywords}```
 
         </keywords>
 
@@ -329,7 +332,7 @@ class ArticleGenerator:
         self.full_article = self._get_completion(prompt)
         return self.full_article
 
-    def _get_abstract(self, final_article):
+    def _get_abstract(self):
         """
         Generate a short abstract of the article within 500 characters.
 
@@ -342,19 +345,13 @@ class ArticleGenerator:
         prompt = f"""
         do the overview of the article within 500 characters.
 
-        article: ```{final_article}```
-        """
-
-        prompt = f"""
-        do the overview of the artciel within 500 characters.
-
-        article: ```{final_article}```
+        article: ```{self.full_article}```
         """
 
         self.abstract = self._get_completion(prompt)
         return self.abstract
     
-    def _create_blog_picture(self, abstract):
+    def _create_blog_picture(self):
         """
         Generate a blog picture based on the provided abstract.
 
@@ -364,7 +361,7 @@ class ArticleGenerator:
         Returns:
             str: The link to the generated blog picture.
         """
-        prompt = f"Create a blog picture in English based on the following blog content: '{abstract}'."
+        prompt = f"Create a blog picture in English based on the following blog content: '{self.abstract}'."
 
         # Specify other parameters
         n = 1  # Number of images to generate
@@ -392,8 +389,8 @@ class ArticleGenerator:
             float: The duration in minutes.
         """
         total_finish_time = time.time()
-        duration = round((total_finish_time - self.total_start_time) / 60, 2)
-        return duration
+        self.duration = round((total_finish_time - self.total_start_time) / 60, 2)
+        return self.duration
 
     def _create_metadata(self, keyword, input_link):
         """
@@ -443,18 +440,18 @@ class ArticleGenerator:
         self.total_start_time = time.time()
         self.today_date = datetime.date.today()
         self.outline = self._get_outline(input_link)
-        self.new_outline = self._generate_new_outline(keyword, self.outline)
-        self.other_keywords = self._generate_keyword(keyword, self.new_outline)
+        self.new_outline = self._generate_new_outline(keyword)
+        self.other_keywords = self._generate_keyword(keyword)
         self.level = self._get_funel_level()
-        self.selected_funnel = self._get_funel(self.level)
-        self.full_article = self._create_article(keyword, self.new_outline, self.selected_funnel, self.other_keywords)
+        self.selected_funnel = self._get_funel()
+        self.full_article = self._create_article(keyword)
 
     def _generate_picture(self):
         """
         Generate a blog picture based on the article's abstract.
         """
-        self.abstract = self._get_abstract(self.full_article)
-        self.image_link = self._create_blog_picture(self.abstract)
+        self.abstract = self._get_abstract()
+        self.image_link = self._create_blog_picture()
 
     def run(self, input_link, keyword):
         """
@@ -466,7 +463,7 @@ class ArticleGenerator:
         """
         self._generate_article(input_link, keyword)
         self._generate_picture()
-        self.duration = self._get_duration()
+        self._get_duration()
         self.metadata = self._create_metadata(keyword, input_link)
 
     def get_all_results(self):
@@ -481,10 +478,3 @@ class ArticleGenerator:
         print()
         print("Meta data: ")
         print(self.metadata)
-
-
-
-
-
-
-
