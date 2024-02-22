@@ -1,6 +1,6 @@
 # dependencies
 pandas==2.2.0
-openai==24.0
+openai>=1.12.0
 python-dotenv~=1.0.1
 markdown==3.5.2
 requests==2.31.0
