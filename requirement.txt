@@ -1,0 +1,13 @@
+# dependencies
+pandas==2.2.0
+openai==24.0
+python-dotenv~=1.0.1
+markdown==3.5.2
+requests==2.31.0
+boto3>=1.15.0
+
+# ImageUploader
+boto3>=1.15.0
+botocore==1.34.47
+Pillow==10.2.0
+requests==2.31.0
