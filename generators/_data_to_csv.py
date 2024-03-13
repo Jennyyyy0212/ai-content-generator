@@ -97,7 +97,7 @@ class BlogDataToDatabase:
         # Commit the changes
         self.conn.commit()
 
-    def insert_json_data_to_db(self, json_data_str):
+    def insert_json_data_to_db(self, json_data_str, name):
         """
         Insert JSON data into the meta table of the database.
 
@@ -126,7 +126,7 @@ class BlogDataToDatabase:
             '''.format(self.meta_table)
 
             self.conn.execute(insert_sql, (
-                json_data.get('title', ''),
+                name,         # data.get('title', '') to make it consistent with the table data
                 json_data.get('blog picture link', ''),
                 json_data.get('primary keyword', ''),
                 json.dumps(json_data.get('other_keywords', [])),  # Convert the list to a JSON string

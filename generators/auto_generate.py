@@ -57,7 +57,7 @@ class AutoGenerator:
             self.content_generator = self.info_generator.content_generator
             self.database_generator = BlogDataToDatabase(self.db_file_name)
             self.database_generator.add_blog_entry(self.info_generator.title, self.info_generator.html_content, self.info_generator.post_summary, self.info_generator.main_t_image, self.info_generator.main_t_image, self.info_generator.meta_title, self.info_generator.meta_description, self.info_generator.image_alt_text, self.info_generator.tag, self.info_generator.read_time_str) 
-            self.database_generator.insert_json_data_to_db(self.content_generator.metadata)
+            self.database_generator.insert_json_data_to_db(self.content_generator.metadata,self.info_generator.title)
             logging.info("Content added successfully.")
         except Exception as e:
             logging.error(f"Error during data creation: {str(e)}")
