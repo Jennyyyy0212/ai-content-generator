@@ -193,7 +193,7 @@ Feel free to contribute to the project by addressing these improvements or sugge
 
 ## Future Update
 ### Fine-turning content
-See more information in another folder: https://github.com/ABConvert/ai-content-generator/tree/master/langchain_test_folder
+See more information in another folder: https://github.com/ABConvert/ai-content-generator/tree/master/langchain_test_folder (Private)
 
 ### Train database to use RAG and LLM
-See more information in another repo: https://github.com/Jennyyyy0212/cro-web-discoverer
+See more information in another repo: https://github.com/Jennyyyy0212/cro-web-discoverer (Private)
