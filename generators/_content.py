@@ -8,8 +8,6 @@ from openai import OpenAI   # Import the OpenAI class from the OpenAI library
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-os.environ['OPENAI_API_KEY'] = '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'
-
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 class ArticleGenerator:
